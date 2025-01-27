@@ -1,6 +1,5 @@
 import React from 'react'
 import './Navbar.css'
-import icon from '../../assets/icons.png'
 
 const Navbar = () => {
   return (

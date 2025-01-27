@@ -13,10 +13,13 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .links{
-    width: 25%;
+    width: 28%;
     display: flex;
     align-items: center;
     justify-content: space-around;
+}
+.links p{
+    font-weight: 600;
 }
 .btns{
     display: flex;
@@ -25,11 +28,12 @@
     justify-content: space-around;
 }
 .btns button{
-    background-color: black;
+    background-color: rgb(77, 35, 231);
     color: white;
     border-radius: 12px;
     width: 44%;
-    padding: 10px;
+    padding: 13px;
+    border: none;
 }
 .ul{
     list-style: none;
