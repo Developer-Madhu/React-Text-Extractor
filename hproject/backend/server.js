@@ -1,144 +1,165 @@
 // const express = require('express');
-// const fileUpload = require('express-fileupload')
 // const multer = require('multer');
-// const pdfParse = require('pdf-parse');
-// const cors = require('cors');
-// const path = require('path')
+// const Tesseract = require('tesseract.js');
+// const path = require('path');
 // const fs = require('fs');
 
-// const app = express();
-// const PORT = 5000;
+// const app = express()
 
-// // app.use(cors());
-// // const filePath = path.join(__dirname, 'test', 'data', '05-versions-space');
-
-
+// const cors = require('cors');
 // app.use(cors());
-// app.use('/', express.static('uploads'))
-// app.use(fileUpload())
 
-// const upload = multer({
-//   storage: multer.memoryStorage(), // Store file in memory for easier parsing
-//   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, 'uploads/'); // Specify the folder for uploaded files
+//     },
+//     filename: (req, file, cb) => {
+//         cb(null, `${Date.now()}-${file.originalname}`); // Create a unique filename
+//     },
 // });
 
-// // Route to upload and process PDF
-// app.post("/", upload.single("pdf"), async (req, res) => {
-//   if (!req.file) {
-//     return res.status(400).json({ error: "No PDF file uploaded" });
-//   }
+// const upload = multer({ storage }); // Initialize Multer with the storage configuration
 
-//   try {
-//     const fileBuffer = req.file.buffer; // Get the uploaded file buffer
-//     const pdfData = await pdfParse(fileBuffer); // Extract text from PDF
-//     return res.send({ text: pdfData.text }); // Send extracted text as response
-//   } catch (error) {
-//     console.error("Error extracting text from PDF:", error);
-//     return res.status(500).json({ error: "Failed to extract text from PDF" });
-//   }
-// });
+// app.post('/home', upload.single('file'), (req, res) => {
+//     // try {
+//     //     if (!req.file) {
+//     //         return res.status(400).json({ error: 'No file uploaded' });
+//     //     }
 
-// // Start the server
-// app.listen(PORT, () => {
-//   console.log(`Server is running on http://localhost:${PORT}`);
-// });
+//     //     // Full path to the uploaded file
+//     //     const imagePath = path.join(__dirname, req.file.path);
+
+//     //     // Perform OCR using Tesseract.js
+//     //     Tesseract.recognize(imagePath, 'eng', { logger: (info) => console.log(info) })
+//     //         .then(({ data: { text } }) => {
+//     //             // Send the extracted text as a response
+//     //             res.json({ extractedText: text });
+
+//     //             // Delete the uploaded file to free up storage
+//     //             fs.unlink(imagePath, (err) => {
+//     //                 if (err) console.error('Error deleting file:', err);
+//     //             });
+//     //         })
+//     //         .catch((error) => {
+//     //             console.error('Error during OCR:', error);
+//     //             res.status(500).json({ error: 'Failed to process image' });
+//     //         });
+//     // } catch (error) {
+//     //     console.error('Unexpected error:', error);
+//     //     res.status(500).json({ error: 'Internal server error' });
+//     // }
+//     const fs = require('fs');
+//     const path = require('path');
+//     const Tesseract = require('tesseract.js');
+
+//     app.post('/home', upload.single('file'), (req, res) => {
+//         try {
+//             if (!req.file) {
+//                 return res.status(400).json({ error: 'No file uploaded' });
+//             }
+
+//             // Read the uploaded file as a buffer
+//             const imagePath = path.join(__dirname, req.file.path);
+//             const imageBuffer = fs.readFileSync(imagePath);
+
+//             // Perform OCR using Tesseract.js
+//             Tesseract.recognize(imageBuffer, 'eng', { logger: (info) => console.log(info) })
+//                 .then(({ data: { text } }) => {
+//                     res.json({ extractedText: text });
+                    
+//                     fs.unlink(imagePath, (err) => {
+//                         if (err) console.error('Error deleting file:', err);
+//                     });
+//                 })
+//                 .catch((error) => {
+//                     console.error('Error during OCR:', error);
+//                     res.status(500).json({ error: 'Failed to process image' });
+//                 });
+//         } catch (error) {
+//             console.error('Unexpected error:', error);
+//             res.status(500).json({ error: 'Internal server error' });
+//         }
+//     });
+// })
+
+// app.listen(5000, () => {
+//     console.log('Connected to port successfully')
+// })
 const express = require('express');
-const fileUpload = require('express-fileupload');
 const multer = require('multer');
-const pdfParse = require('pdf-parse');
-const tesseract = require('tesseract.js'); // OCR library for images
-const cors = require('cors');
+const Tesseract = require('tesseract.js');
+const pdfParse = require('pdf-parse'); // Import pdf-parse
 const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = 5000;
+const cors = require('cors');
+app.use(cors());
 
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173'];
+// Multer setup for file uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Folder for uploaded files
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`); // Unique filename
+    },
+});
+const upload = multer({ storage }); // Initialize Multer
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+app.post('/home', upload.single('file'), (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const filePath = path.join(__dirname, req.file.path);
+
+        // Check file type
+        const fileExtension = path.extname(req.file.originalname).toLowerCase();
+
+        if (fileExtension === '.pdf') {
+            // Handle PDF file
+            const fileBuffer = fs.readFileSync(filePath);
+
+            pdfParse(fileBuffer)
+                .then((pdfData) => {
+                    res.json({ extractedText: pdfData.text });
+
+                    // Delete the uploaded file
+                    fs.unlink(filePath, (err) => {
+                        if (err) console.error('Error deleting file:', err);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error processing PDF:', error);
+                    res.status(500).json({ error: 'Failed to process PDF' });
+                });
+        } else {
+            // Handle image file with Tesseract.js
+            const imageBuffer = fs.readFileSync(filePath);
+
+            Tesseract.recognize(imageBuffer, 'eng', { logger: (info) => console.log(info) })
+                .then(({ data: { text } }) => {
+                    res.json({ extractedText: text });
+
+                    // Delete the uploaded file
+                    fs.unlink(filePath, (err) => {
+                        if (err) console.error('Error deleting file:', err);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error during OCR:', error);
+                    res.status(500).json({ error: 'Failed to process image' });
+                });
+        }
+    } catch (error) {
+        console.error('Unexpected error:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-  },
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-
-app.use('/', express.static('uploads'));
-app.use(fileUpload());
-
-app.use(express.json({ limit: '50mb' })); 
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-
-const bodyParser = require('body-parser');
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
-
-const upload = multer({
-  // storage: multer.memoryStorage(), // Store file in memory for easier parsing
-  limits: { fileSize: 50 * 1024 * 1024 }, // Limit file size to 5MB
 });
 
-const extractTextFromImage = (imageBuffer) => {
-  return new Promise((resolve, reject) => {
-    tesseract.recognize(
-      imageBuffer,
-      'eng', // Language for OCR
-      {
-        logger: (m) => console.log(m), // Optional logging
-      }
-    )
-      .then(({ data: { text } }) => resolve(text))
-      .catch((error) => reject(error));
-  });
-};
-
-// Route to upload and process files (PDF or image)
-app.post("/", upload.single("file"), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
-  }
-
-  try {
-    fs.readFile('example.pdf', (err, data) => {
-      if (err) {
-        console.error("Error reading PDF:", err);
-        return;
-      }
-    
-      pdfParse(data).then((pdfData) => {
-        console.log("Extracted text from PDF:", pdfData.text);
-      }).catch((error) => {
-        console.error("Error extracting PDF text:", error);
-      });
-    });
-    // const fileBuffer = req.file.buffer;
-    // const fileExtension = path.extname(req.file.originalname).toLowerCase();
-
-    // // If file is a PDF, extract text using pdf-parse
-    // if (fileExtension === '.pdf') {
-    //   const pdfData = await pdfParse(fileBuffer);
-    //   return res.send({ text: pdfData.text });
-
-    // // If file is an image, extract text using Tesseract.js
-    // } else if (['.jpg', '.jpeg', '.png'].includes(fileExtension)) {
-    //   const extractedText = await extractTextFromImage(fileBuffer);
-    //   return res.send({ text: extractedText });
-
-    // } else {
-    //   return res.status(400).json({ error: "Unsupported file type. Please upload a PDF or an image (JPG, JPEG, PNG)." });
-    // }
-  } catch (error) {
-    console.error("Error processing file:", error);
-    return res.status(500).json({ error: "Failed to extract text from the file" });
-  }
-});
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(5000, () => {
+    console.log('Connected to port successfully');
 });

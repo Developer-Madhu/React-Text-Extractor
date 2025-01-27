@@ -1,14 +1,16 @@
 import React, { useState } from "react";
+import axios from 'axios'
 import "./ImageUpload.css";
 
 const ImageUpload = () => {
   const [imageFile, setImageFile] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
   const [response, setResponse] = useState(null);
+  const [extractedText, setExtractedText] = useState("");
 
   const handleImageChange = (e) => {
     setImageFile(e.target.files[0]);
-  };
+  }
 
   const handlePdfChange = (e) => {
     setPdfFile(e.target.files[0]);
@@ -22,26 +24,19 @@ const ImageUpload = () => {
 
     const formData = new FormData();
     if (imageFile) {
-      formData.append("file", imageFile); 
+      formData.append("file", imageFile);
     }
     if (pdfFile) {
-      formData.append("pdfFile", pdfFile); 
-    } 
+      formData.append("file", pdfFile);
+    }
     try {
-      const res = await fetch("http://localhost:5000/", {
-        method: "POST",
-        body: formData,
+      const res = await axios.post("http://localhost:5000/home", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+      setExtractedText(res.data.extractedText)
 
-      if (res.ok) {
-        const result = await res.json();
-        console.log(result); // Process the result (extracted text)
-      } else {
-        console.error("Error:", res.statusText);
-      }
-
-      const data = await res.json();
-      setResponse(data.text);
     } catch (error) {
       console.error("Upload failed:", error);
       alert("Failed to upload the file. Please try again.");
@@ -56,7 +51,7 @@ const ImageUpload = () => {
 
   return (
     <div className="upload-container">
-    
+
       <div className="upload-section">
         <h2 className="upload-title">Upload Image</h2>
         <div className="upload-box">
@@ -136,7 +131,8 @@ const ImageUpload = () => {
           Remove
         </button>
       </div>
-      {response && (
+      
+      {/* {response && (
         <div className="response-section">
           <h3>Uploaded Files:</h3>
           <ul>
@@ -147,7 +143,15 @@ const ImageUpload = () => {
             ))}
           </ul>
         </div>
+      )} */}
+
+      {extractedText && (
+        <div className="response-section">
+          <h3>Extracted Text:</h3>
+          <p className="typed-text">{extractedText}</p>
+        </div>
       )}
+
     </div>
   );
 };

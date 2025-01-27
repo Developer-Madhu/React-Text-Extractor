@@ -1,16 +1,13 @@
 import React from 'react'
 import './Homepage.css'
 import Navbar from './Navbar/Navbar'
-import ImageUpload from './ImageUpload/imageUpload'
-import TypewriterText from './TypeText/TypewriterText'
+import ImageUpload from './ImageUpload/ImageUpload'
 
 const Homepage = () => {
   return (
     <div className='homepage'>
         <Navbar />
         <ImageUpload />
-        <br />
-        <TypewriterText />
         <br />
     </div>
   )

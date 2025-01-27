@@ -12,6 +12,8 @@
 .upload-title {
   font-size: 18px;
   margin-bottom: 10px;
+  font-weight: 500;
+  font-family: 'Poppins';
 }
 
 .upload-box {
@@ -19,6 +21,9 @@
   padding: 20px;
   border-radius: 10px;
   cursor: pointer;
+}
+.upload-box img{
+  width: 100%;
 }
 
 .upload-label {
@@ -91,4 +96,94 @@ pre {
   padding: 10px;
   border-radius: 5px;
   overflow-x: auto;
+}
+
+.ebtn{
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  color: white;
+  padding: 10px;
+}
+
+.eb1, .eb2{
+  background-color: rgba(0, 0, 255, 0.792);
+  padding: 15px;
+  border-radius: 12px;
+  border: none;
+  color: white;
+}
+
+.response-section {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 20px auto;
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+.response-section h3 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.typed-text-container {
+  white-space: pre-wrap; 
+  overflow: hidden;
+  display: block;
+}
+
+.typed-text {
+  font-size: 18px;
+  color: #555;
+  display: block;
+  opacity: 0;
+  animation: typing 0.2s steps(30) forwards, fadeIn 1s forwards;
+  margin-bottom: 10px; 
+}
+
+@keyframes typing {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100%{
+    opacity: 1;
+  }
+}
+
+.typed-text-container .typed-text:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typed-text-container .typed-text:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.typed-text-container .typed-text:nth-child(3) {
+  animation-delay: 2s;
+}
+
+.typed-text-container .typed-text:nth-child(4) {
+  animation-delay: 3s;
+}
+
+span{
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }

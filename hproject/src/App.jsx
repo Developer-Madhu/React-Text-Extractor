@@ -1,13 +1,20 @@
 import { useState } from 'react'
 import './App.css'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Homepage from './Components/Homepage'
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const route = createBrowserRouter([
+    {
+      path:'/home',
+      element:<Homepage />
+    }
+  ])
 
   return (
     <div className='app'>
-     <Homepage />
+     <RouterProvider router={route} />
     </div>
   )
 }
